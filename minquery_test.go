@@ -71,6 +71,16 @@ func TestMinQuery(t *testing.T) {
 		eq(nil, c.Insert(u))
 	}
 
+	t.Run("collation", func(t *testing.T) {
+		var result []*User
+		mq1 := New(sess.DB(""), "users", bson.M{"name": "alice"}).
+			Collation(bson.M{"locale": "en", "strength": 1}).
+			Limit(5)
+		_, err := mq1.All(&result, cursorFields...)
+		eq(nil, err)
+		deq(users[1:3], result)
+	})
+
 	mq := New(sess.DB(""), "users", bson.M{"country": "US"}).
 		Sort("name", "_id").Limit(3)
 
